@@ -1,45 +1,63 @@
 ﻿using System;
 
-class Conta
+class Personagem
 {
-    private readonly int numero;
-    private string titular;
-    private double saldo;
-    private double limite;
+    private string nome;
+    private string classe;
+    private int nivel;
+    private double vidaAtual;
+    private double vidaMaxima;
 
-    public double SaldoTotal => saldo + limite;
-
-    public string StatusConta => saldo < 0 ? "Negativo" : "Positivo";
-
-    public Conta(int numero, string titular)
+    public Personagem(string nome, string classe)
     {
-        this.numero = numero;
-        this.titular = titular;
-        this.saldo = 0;
-        this.limite = 500;
+        this.nome = nome;
+        this.classe = classe;
+        this.nivel = 1;
+
+        if (classe == "Guerreiro")
+            vidaMaxima = 150;
+        else
+            vidaMaxima = 80;
+
+        vidaAtual = vidaMaxima;
     }
 
-    public bool Depositar(double valor)
+    public void ReceberDano(double pontos)
     {
-        if (valor <= 0) return false;
-
-        saldo += valor;
-        return true;
+        vidaAtual -= pontos;
+        if (vidaAtual < 0)
+            vidaAtual = 0;
     }
 
-    public bool Sacar(double valor)
+    public void Curar(double pontos)
     {
-        if (valor <= SaldoTotal)
+        if (vidaAtual == 0)
         {
-            saldo -= valor;
-            return true;
+            Console.WriteLine("Personagem morto!");
+            return;
         }
-        return false;
+
+        vidaAtual += pontos;
+        if (vidaAtual > vidaMaxima)
+            vidaAtual = vidaMaxima;
+    }
+
+    public void SubirNivel()
+    {
+        if (vidaAtual == 0)
+        {
+            Console.WriteLine("Personagem morto!");
+            return;
+        }
+
+        nivel++;
+        vidaMaxima *= 1.10;
+        vidaAtual = vidaMaxima;
     }
 
     public override string ToString()
     {
-        return $"Conta: {numero} | Titular: {titular} | Saldo: {saldo} | Limite: {limite}";
+        return $"{nome} ({classe}) - Lvl {nivel} - HP: {vidaAtual}/{vidaMaxima}";
     }
 }
 
@@ -47,12 +65,20 @@ class Program
 {
     static void Main(string[] args)
     {
-        Conta conta = new Conta(123, "Marcelo");
+        Personagem p = new Personagem("Marcelo", "Guerreiro");
 
-        conta.Depositar(200);
-        conta.Sacar(600); // usa limite
+        Console.WriteLine(p);
 
-        Console.WriteLine(conta);
-        Console.WriteLine("Status: " + conta.StatusConta);
+        p.ReceberDano(50);
+        Console.WriteLine(p);
+
+        p.SubirNivel();
+        Console.WriteLine(p);
+
+        p.ReceberDano(200);
+        Console.WriteLine(p);
+
+        p.Curar(50); // não funciona (morto)
+        p.SubirNivel(); // não funciona (morto)
     }
 }
