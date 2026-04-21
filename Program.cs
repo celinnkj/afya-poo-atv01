@@ -1,42 +1,61 @@
 ﻿using System;
 
-class Lampada
+class Cofre
 {
-    private string marca;
-    private readonly string tecnologia;
-    private bool ligada;
-    private int brilho;
+    private string dono;
+    private string senha;
+    private bool estaAberto;
+    private int tentativas;
 
-    public Lampada(string marca, string tecnologia)
+    public bool EstaAberto => estaAberto;
+
+    public Cofre(string dono, string senha)
     {
-        this.marca = marca;
-        this.tecnologia = tecnologia;
-        this.ligada = false;
-        this.brilho = 100;
+        this.dono = dono;
+        this.senha = senha;
+        this.estaAberto = false;
+        this.tentativas = 0;
     }
 
-    public void Alternar()
+    public void Abrir(string senhaInformada)
     {
-        ligada = !ligada;
-    }
-
-    public void AjustarBrilho(int novoBrilho)
-    {
-        if (!ligada)
+        if (tentativas >= 3)
         {
-            Console.WriteLine("A lâmpada precisa estar ligada.");
+            Console.WriteLine("Cofre Bloqueado!");
             return;
         }
 
-        if (novoBrilho >= 0 && novoBrilho <= 100)
+        if (senhaInformada == senha)
         {
-            brilho = novoBrilho;
+            estaAberto = true;
+            tentativas = 0;
+            Console.WriteLine("Cofre aberto!");
+        }
+        else
+        {
+            tentativas++;
+            Console.WriteLine("Senha incorreta!");
         }
     }
 
-    public override string ToString()
+    public void Fechar()
     {
-        return $"Marca: {marca} | Tecnologia: {tecnologia} | Ligada: {ligada} | Brilho: {brilho}";
+        estaAberto = false;
+    }
+
+    public void AlterarSenha(string senhaAntiga, string novaSenha)
+    {
+        if (!estaAberto)
+        {
+            Console.WriteLine("O cofre precisa estar aberto.");
+            return;
+        }
+
+        if (senhaAntiga == senha)
+        {
+            senha = novaSenha;
+            Console.WriteLine("Senha alterada!");
+        }
     }
 }
 
@@ -44,13 +63,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        Lampada lampada = new Lampada("Philips", "LED");
+        Cofre cofre = new Cofre("Marcelo", "1234");
 
-        Console.WriteLine(lampada);
+        cofre.Abrir("1111");
+        cofre.Abrir("2222");
+        cofre.Abrir("3333");
+        cofre.Abrir("1234"); // deve bloquear antes
 
-        lampada.Alternar();
-        lampada.AjustarBrilho(50);
+        cofre.Abrir("1234");
 
-        Console.WriteLine(lampada);
+        cofre.Fechar();
     }
 }
