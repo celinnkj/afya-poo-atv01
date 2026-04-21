@@ -1,61 +1,45 @@
 ﻿using System;
 
-class Cofre
+class Conta
 {
-    private string dono;
-    private string senha;
-    private bool estaAberto;
-    private int tentativas;
+    private readonly int numero;
+    private string titular;
+    private double saldo;
+    private double limite;
 
-    public bool EstaAberto => estaAberto;
+    public double SaldoTotal => saldo + limite;
 
-    public Cofre(string dono, string senha)
+    public string StatusConta => saldo < 0 ? "Negativo" : "Positivo";
+
+    public Conta(int numero, string titular)
     {
-        this.dono = dono;
-        this.senha = senha;
-        this.estaAberto = false;
-        this.tentativas = 0;
+        this.numero = numero;
+        this.titular = titular;
+        this.saldo = 0;
+        this.limite = 500;
     }
 
-    public void Abrir(string senhaInformada)
+    public bool Depositar(double valor)
     {
-        if (tentativas >= 3)
-        {
-            Console.WriteLine("Cofre Bloqueado!");
-            return;
-        }
+        if (valor <= 0) return false;
 
-        if (senhaInformada == senha)
-        {
-            estaAberto = true;
-            tentativas = 0;
-            Console.WriteLine("Cofre aberto!");
-        }
-        else
-        {
-            tentativas++;
-            Console.WriteLine("Senha incorreta!");
-        }
+        saldo += valor;
+        return true;
     }
 
-    public void Fechar()
+    public bool Sacar(double valor)
     {
-        estaAberto = false;
+        if (valor <= SaldoTotal)
+        {
+            saldo -= valor;
+            return true;
+        }
+        return false;
     }
 
-    public void AlterarSenha(string senhaAntiga, string novaSenha)
+    public override string ToString()
     {
-        if (!estaAberto)
-        {
-            Console.WriteLine("O cofre precisa estar aberto.");
-            return;
-        }
-
-        if (senhaAntiga == senha)
-        {
-            senha = novaSenha;
-            Console.WriteLine("Senha alterada!");
-        }
+        return $"Conta: {numero} | Titular: {titular} | Saldo: {saldo} | Limite: {limite}";
     }
 }
 
@@ -63,15 +47,12 @@ class Program
 {
     static void Main(string[] args)
     {
-        Cofre cofre = new Cofre("Marcelo", "1234");
+        Conta conta = new Conta(123, "Marcelo");
 
-        cofre.Abrir("1111");
-        cofre.Abrir("2222");
-        cofre.Abrir("3333");
-        cofre.Abrir("1234"); // deve bloquear antes
+        conta.Depositar(200);
+        conta.Sacar(600); // usa limite
 
-        cofre.Abrir("1234");
-
-        cofre.Fechar();
+        Console.WriteLine(conta);
+        Console.WriteLine("Status: " + conta.StatusConta);
     }
 }
